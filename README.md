@@ -1,3 +1,12 @@
+# Update to Tensorflow 2.9 and MobileNetV1 implementation
+
+This is a Mask R-CNN implementation with MobileNet V1 as Backbone architecture to be finally able to deploy it on mobile devices such as the NXP i.MX 8 Series.
+
+- [X] Add Mobilenet V1 backbone options (besides ResNet 50 and 101) + dependencies in the model
+- [X] Add Python 3.10 Support
+- [X] Add Tensorflow 2.9 Support
+- [X] Azure Machine Learning Dataset implementation [utils.py](mrcnn/utils.py)
+
 # Mask R-CNN for Object Detection and Segmentation
 
 This is an implementation of [Mask R-CNN](https://arxiv.org/abs/1703.06870) on Python 3, Keras, and TensorFlow. The model generates bounding boxes and segmentation masks for each instance of an object in the image. It's based on Feature Pyramid Network (FPN) and a ResNet101 backbone.
