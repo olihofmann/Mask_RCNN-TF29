@@ -22,9 +22,11 @@ import urllib.request
 import shutil
 import warnings
 from distutils.version import LooseVersion
+from azureml.core import Model
 
 # URL from which to download the latest COCO trained weights
 COCO_MODEL_URL = "https://github.com/matterport/Mask_RCNN/releases/download/v2.0/mask_rcnn_coco.h5"
+COCO_MOBILE_MODEL_NAME = "mask_rcnn_mobile_coco"
 
 
 ############################################################
@@ -199,8 +201,8 @@ def box_refinement_graph(box, gt_box):
 
     dy = (gt_center_y - center_y) / height
     dx = (gt_center_x - center_x) / width
-    dh = tf.log(gt_height / height)
-    dw = tf.log(gt_width / width)
+    dh = tf.math.log(gt_height / height)
+    dw = tf.math.log(gt_width / width)
 
     result = tf.stack([dy, dx, dh, dw], axis=1)
     return result
@@ -837,15 +839,21 @@ def batch_slice(inputs, graph_fn, batch_size, names=None):
     return result
 
 
-def download_trained_weights(coco_model_path, verbose=1):
+def download_trained_weights(coco_model_path, backbone, verbose=1, azureml_workspace=None):
     """Download COCO trained weights from Releases.
 
     coco_model_path: local path of COCO trained weights
     """
     if verbose > 0:
         print("Downloading pretrained model to " + coco_model_path + " ...")
-    with urllib.request.urlopen(COCO_MODEL_URL) as resp, open(coco_model_path, 'wb') as out:
-        shutil.copyfileobj(resp, out)
+
+    if backbone in ["resnet50", "resnet101"]:
+        with urllib.request.urlopen(COCO_MODEL_URL) as resp, open(coco_model_path, 'wb') as out:
+            shutil.copyfileobj(resp, out)
+    if backbone in ["mobilenetv1"]:
+        pretrained_model = Model(azureml_workspace, name=COCO_MOBILE_MODEL_NAME)
+        pretrained_model.download(coco_model_path, exist_ok=True)
+    
     if verbose > 0:
         print("... done downloading pretrained model!")
 
